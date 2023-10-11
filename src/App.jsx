@@ -1,5 +1,5 @@
 import { ChatContainer, MainContainer, Message, MessageInput, MessageList, TypingIndicator } from "@chatscope/chat-ui-kit-react"
-import "./app.css"
+
 import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
 import { useState } from "react";
 
