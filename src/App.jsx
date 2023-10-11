@@ -5,7 +5,7 @@ import { useState } from "react";
 
 function App() {
 
-  const API_KEY = import.meta.env.VITE_APP_ChatGPT_API_KEY;
+  // const API_KEY = import.meta.env.VITE_APP_ChatGPT_API_KEY;
   //   const [typing , setTyping] = useState(false)
   //   const [messages,setMessages] = useState([
     //     {
@@ -78,7 +78,7 @@ function App() {
 
 
 
-// const API_KEY = "NOthing"
+const API_KEY = "NOthing"
 // const API_KEY = " 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";
 const [typing, setTyping] = useState(false);
 const [messages, setMessages] = useState([
