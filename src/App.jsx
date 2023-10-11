@@ -1,10 +1,12 @@
-import { ChatContainer, MainContainer, Message, MessageInput, MessageList } from "@chatscope/chat-ui-kit-react"
+import { ChatContainer, MainContainer, Message, MessageInput, MessageList, TypingIndicator } from "@chatscope/chat-ui-kit-react"
 import "./app.css"
 import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
 import { useState } from "react";
 
-
 function App() {
+
+  const API_KEY = import.meta.env.VITE_APP_ChatGPT_API_KEY;
+  const [typing , setTyping] = useState(false)
   const [messages,setMessages] = useState([
     {
       message:"Hello ChatGpt here",
@@ -19,7 +21,56 @@ function App() {
     }
     const newMessages = [...messages,newMessage]
     setMessages(newMessages)
+    setTyping(true);
+    // setTimeout(() => {
+    //   setTyping(false);
+    // }, 3000);
+    await processMessageToChatGPT(newMessages)
   }
+  async function processMessageToChatGPT(chatMessages){
+    //chatMessages {sender:"user" or "chatGPT",message:"The message content here"}
+    //apiMessages {role:"user" or "assistant" , content:"The message content here"}
+    let apiMessages = chatMessages.map((messageObject)=>{
+      let role=" ";
+      if(messageObject.sender === "ChatGPT"){
+        role="assistant"
+      }else{
+        role="user"
+      }
+      return {
+        role:role,content:messageObject.message
+      }
+    });
+
+    const systemMessage= {
+      role:"system",
+      content:"Explain all concepts of Life"
+    }
+    const apiRequestBody = {
+      "model": "gpt-3.5-turbo",
+     "messages": [
+      systemMessage,
+      ...apiMessages],
+    }
+    const response = await fetch("https://api.openai.com/v1/chat/completions",{
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " +API_KEY,
+        "Content-Type": "application/json"
+      },
+      
+      body:JSON.stringify(apiRequestBody)
+  })
+  const data = await response.json()
+  console.log(data)
+  setMessages([
+    ...chatMessages,{
+      message:data?.choices[0].message.content,
+      sender:"ChatGPT"
+    }
+  ])
+  setTyping(false)
+}
 
   return (
     <>
@@ -27,7 +78,10 @@ function App() {
        <div style={{position:"relative",height:"100vh",width:"100vw"}}>
         <MainContainer>
           <ChatContainer>
-          <MessageList>
+          <MessageList
+
+          typingIndicator={typing? <TypingIndicator content="ChatGPT is Typing"/>:null }
+          >
           {messages.map((m,i)=>{
             return <Message key={i} model={m}/>
           })}
